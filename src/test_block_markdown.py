@@ -1,5 +1,5 @@
 import unittest
-from block_markdown import markdown_to_blocks
+from block_markdown import markdown_to_blocks, block_to_blocktype, BlockType
 
 
 class TestMarkdownToBlocks(unittest.TestCase):
@@ -85,6 +85,62 @@ Paragraph two.
             [
                 "Just a single block with no blank lines.",
             ],
+        )
+
+
+class TestBlockToBlockType(unittest.TestCase):
+    def test_heading(self):
+        self.assertEqual(
+            block_to_blocktype("# Heading 1"),
+            BlockType.HEADING,
+        )
+        self.assertEqual(
+            block_to_blocktype("###### Heading 6"),
+            BlockType.HEADING,
+        )
+        self.assertNotEqual(
+            block_to_blocktype("####### Not a heading"),
+            BlockType.HEADING,
+        )
+
+    def test_code_block(self):
+        code = "```\nprint('hello')\n```"
+        self.assertEqual(
+            block_to_blocktype(code),
+            BlockType.CODE,
+        )
+
+    def test_quote_block(self):
+        quote = "> This is a quote\n> with two lines"
+        self.assertEqual(
+            block_to_blocktype(quote),
+            BlockType.QUOTE,
+        )
+
+    def test_unordered_list(self):
+        ul = "- item one\n- item two"
+        self.assertEqual(
+            block_to_blocktype(ul),
+            BlockType.UNORDERED_LIST,
+        )
+
+    def test_ordered_list(self):
+        ol = "1. first\n2. second\n3. third"
+        self.assertEqual(
+            block_to_blocktype(ol),
+            BlockType.ORDERED_LIST,
+        )
+        not_ol = "1. first\n3. not incremented"
+        self.assertNotEqual(
+            block_to_blocktype(not_ol),
+            BlockType.ORDERED_LIST,
+        )
+
+    def test_paragraph(self):
+        para = "Just a normal paragraph of text."
+        self.assertEqual(
+            block_to_blocktype(para),
+            BlockType.PARAGRAPH,
         )
 
 

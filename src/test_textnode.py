@@ -37,8 +37,8 @@ class TestTextNode(unittest.TestCase):
         self.assertNotEqual(node, node2)
 
     def test_nourl1(self):
-        node = TextNode("Believe in yourself", TextType.PLAIN, None)
-        node2 = TextNode("Believe in yourself", TextType.PLAIN)
+        node = TextNode("Believe in yourself", TextType.TEXT, None)
+        node2 = TextNode("Believe in yourself", TextType.TEXT)
         self.assertEqual(node, node2)
 
     def test_nourl2(self):

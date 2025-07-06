@@ -1,3 +1,4 @@
+import re
 from textnode import TextType, TextNode
 from leafnode import LeafNode
 from parentnode import ParentNode
@@ -34,7 +35,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         split_parts = node.text.split(delimiter)
         if len(split_parts) % 2 == 0:
             raise Exception("Error: invalid Markdown syntax")
-        for i, part in enumerate:
+        for i, part in enumerate(split_parts):
             if part == "":
                 continue
             if i % 2 == 0:
@@ -42,3 +43,13 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 final_list.append(TextNode(part, text_type))
     return final_list
+
+
+def extract_markdown_images(text):
+    matches = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches
+
+
+def extract_markdown_links(text):
+    matches = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+    return matches

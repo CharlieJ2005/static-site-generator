@@ -7,6 +7,7 @@ from converter import (
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
 )
 from textnode import TextNode, TextType
 
@@ -356,6 +357,64 @@ class TestSplitNodesImageAndLink(unittest.TestCase):
                 TextNode("Just some text, no links here.", TextType.TEXT),
             ],
             new_nodes,
+        )
+
+
+class TestTextToTextNodes(unittest.TestCase):
+    def test_basic_markdown(self):
+        text = "This is **bold** and _italic_ and `code`."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            nodes,
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(".", TextType.TEXT),
+            ]
+        )
+
+    def test_images_and_links(self):
+        text = "![alt](imgurl) and [link](url)"
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            nodes,
+            [
+                TextNode("alt", TextType.IMAGE, "imgurl"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "url"),
+            ]
+        )
+
+    def test_mixed_markdown(self):
+        text = "Start **bold** _italic_ `code` ![img](url) [link](url2) end"
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            nodes,
+            [
+                TextNode("Start ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" ", TextType.TEXT),
+                TextNode("img", TextType.IMAGE, "url"),
+                TextNode(" ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "url2"),
+                TextNode(" end", TextType.TEXT),
+            ]
+        )
+
+    def test_no_markdown(self):
+        text = "Just plain text."
+        nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            nodes,
+            [TextNode("Just plain text.", TextType.TEXT)],
         )
 
 

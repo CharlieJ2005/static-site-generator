@@ -1,7 +1,6 @@
 import re
 from textnode import TextType, TextNode
 from leafnode import LeafNode
-from parentnode import ParentNode
 
 
 def text_node_to_html_node(text_node):
@@ -43,6 +42,73 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 final_list.append(TextNode(part, text_type))
     return final_list
+
+
+def split_nodes_image(old_nodes):
+    result_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            result_nodes.append(node)
+            continue
+
+        text = node.text
+        images = extract_markdown_images(text)
+        if not images:
+            result_nodes.append(node)
+            continue
+
+        curr_pos = 0
+        for alt, url in images:
+            # Find the image markdown in the text
+            img_md = f"![{alt}]({url})"
+            idx = text.find(img_md, curr_pos)
+            if idx == -1:
+                raise ValueError("Invalid markdown: image section not closed")
+            # Add text before the image, if any
+            if idx > curr_pos:
+                before = text[curr_pos:idx]
+                if before:
+                    result_nodes.append(TextNode(before, TextType.TEXT))
+            # Add the image node
+            result_nodes.append(TextNode(alt, TextType.IMAGE, url))
+            curr_pos = idx + len(img_md)
+        # Add any remaining text after the last image
+        if curr_pos < len(text):
+            result_nodes.append(TextNode(text[curr_pos:], TextType.TEXT))
+    return result_nodes
+
+
+def split_nodes_link(old_nodes):
+    result_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.TEXT:
+            result_nodes.append(node)
+            continue
+
+        text = node.text
+        links = extract_markdown_links(text)
+        if not links:
+            result_nodes.append(node)
+            continue
+
+        curr_pos = 0
+        for label, url in links:
+            link_md = f"[{label}]({url})"
+            idx = text.find(link_md, curr_pos)
+            if idx == -1:
+                raise ValueError("Invalid markdown: link section not closed")
+            # Add text before the link, if any
+            if idx > curr_pos:
+                before = text[curr_pos:idx]
+                if before:
+                    result_nodes.append(TextNode(before, TextType.TEXT))
+            # Add the link node
+            result_nodes.append(TextNode(label, TextType.LINK, url))
+            curr_pos = idx + len(link_md)
+        # Add any remaining text after the last link
+        if curr_pos < len(text):
+            result_nodes.append(TextNode(text[curr_pos:], TextType.TEXT))
+    return result_nodes
 
 
 def extract_markdown_images(text):

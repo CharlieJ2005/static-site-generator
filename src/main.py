@@ -5,7 +5,11 @@ from block_markdown import markdown_to_html_node
 
 def main():
     copy_dir("static", "public")
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_pages_recursive(
+        "content",
+        "template.html",
+        "public"
+        )
 
 
 def copy_dir(src, dest):
@@ -49,6 +53,20 @@ def generate_page(from_path, template_path, dest_path):
         os.makedirs(dest_dir)
     with open(dest_path, "w") as f:
         f.write(page)
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for item in os.listdir(dir_path_content):
+        content_path = os.path.join(dir_path_content, item)
+        dest_path = os.path.join(dest_dir_path, item)
+        if os.path.isdir(content_path):
+            generate_pages_recursive(content_path, template_path, dest_path)
+        elif os.path.isfile(content_path) and content_path.endswith(".md"):
+            dest_dir = os.path.dirname(dest_path)
+            if dest_dir and not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+            dest_html_path = os.path.splitext(dest_path)[0] + ".html"
+            generate_page(content_path, template_path, dest_html_path)
 
 
 if __name__ == "__main__":

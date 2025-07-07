@@ -1,6 +1,5 @@
 import os
 import shutil
-from textnode import TextType, TextNode
 
 
 def main():
@@ -20,6 +19,14 @@ def copy_dir(src, dest):
         elif os.path.isdir(src_path):
             copy_dir(src_path, dest_path)
             print(f"Copied directory: {src_path} -> {dest_path}")
+
+
+def extract_title(markdown):
+    for line in markdown.split("\n"):
+        line = line.strip()
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise Exception("Error: h1 header found")
 
 
 if __name__ == "__main__":

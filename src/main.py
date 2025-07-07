@@ -13,7 +13,7 @@ def main():
     generate_pages_recursive(
         "content",
         "template.html",
-        "public",
+        "docs",
         basepath
         )
 

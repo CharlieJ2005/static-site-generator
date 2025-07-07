@@ -9,11 +9,12 @@ def main():
         basepath = sys.argv[1]
     else:
         basepath = "/"
-    copy_dir("static", "public")
+    copy_dir("static", "docs")
     generate_pages_recursive(
         "content",
         "template.html",
-        "public"
+        "public",
+        basepath
         )
 
 
@@ -72,13 +73,23 @@ def generate_pages_recursive(
         content_path = os.path.join(dir_path_content, item)
         dest_path = os.path.join(dest_dir_path, item)
         if os.path.isdir(content_path):
-            generate_pages_recursive(content_path, template_path, dest_path)
+            generate_pages_recursive(
+                content_path,
+                template_path,
+                dest_path,
+                basepath
+                )
         elif os.path.isfile(content_path) and content_path.endswith(".md"):
             dest_dir = os.path.dirname(dest_path)
             if dest_dir and not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
             dest_html_path = os.path.splitext(dest_path)[0] + ".html"
-            generate_page(content_path, template_path, dest_html_path)
+            generate_page(
+                content_path,
+                template_path,
+                dest_html_path,
+                basepath
+                )
 
 
 if __name__ == "__main__":

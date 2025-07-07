@@ -1,6 +1,5 @@
 import re
 from inline_markdown import text_to_textnodes, text_node_to_html_node
-from htmlnode import HTMLNode
 from parentnode import ParentNode
 from textnode import TextNode, TextType
 from enum import Enum
@@ -98,7 +97,7 @@ def heading_to_html_node(block):
             break
     if level + 1 >= len(block):
         raise ValueError(f"invalid heading level: {level}")
-    text = block[level + 1 :]
+    text = block[level + 1:]
     children = text_to_children(text)
     return ParentNode(f"h{level}", children)
 
